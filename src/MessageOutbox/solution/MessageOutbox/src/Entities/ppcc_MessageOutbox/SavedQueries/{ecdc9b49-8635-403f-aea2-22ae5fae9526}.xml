@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{ecdc9b49-8635-403f-aea2-22ae5fae9526}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="ppcc_name" select="1" icon="1" preview="1">
+        <row name="result" id="ppcc_messageoutboxid">
+          <cell name="ppcc_name" width="175" />
+          <cell name="ppcc_entity" width="100" />
+          <cell name="ppcc_recordid" width="225" />
+          <cell name="statuscode" width="119" />
+          <cell name="createdon" width="125" />
+          <cell name="ppcc_messagesenton" width="138" />
+          <cell name="ppcc_messageprocessedon" width="170" />
+          <cell name="ppcc_messageid" width="105" />
+          <cell name="modifiedon" width="113" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>0</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="ppcc_messageoutbox">
+          <attribute name="ppcc_messageoutboxid" />
+          <attribute name="ppcc_name" />
+          <attribute name="createdon" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <attribute name="ppcc_entity" />
+          <attribute name="ppcc_recordid" />
+          <order attribute="createdon" descending="true" />
+          <attribute name="statuscode" />
+          <attribute name="ppcc_messageid" />
+          <attribute name="ppcc_messagesenton" />
+          <attribute name="ppcc_messageprocessedon" />
+          <attribute name="modifiedon" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Active Message Outbox" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

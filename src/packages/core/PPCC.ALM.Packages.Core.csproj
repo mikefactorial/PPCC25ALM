@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>PPCC.ALM.Packages.Core</AssemblyTitle>
+    <Product>PPCC.ALM.Packages.Core</Product>
+    <Copyright>Copyright © 2025</Copyright>
+  </PropertyGroup>
+  	<PropertyGroup>
+		<DefaultDataPackageFolder>Data</DefaultDataPackageFolder>
+	</PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.PDPackage" Version="1.*">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CrmSdk.XrmTooling.CoreAssembly" Version="9.1.1.65" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CrmSdk.XrmTooling.PackageDeployment" Version="9.1.0.184" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Controls\solution\Controls\Controls.cdsproj" ReferenceOutputAssembly="false" ImportOrder="1" ImportMode="async" />
+    <ProjectReference Include="..\..\MessageOutbox\solution\MessageOutbox\MessageOutbox.cdsproj" ReferenceOutputAssembly="false" ImportOrder="2" ImportMode="async" />
+  </ItemGroup>
+
+  <!-- Package up Configuration Data (Runs after Publish Target located in \.nuget\packages\Microsoft.PowerApps.MSBuild.PDPackage\x.x.x\build\PDPackage.Packaging.Targets) -->
+	<Target Name="ZipDataPackage" AfterTargets="ValidatePublishDirForPdPackage" Condition="Exists('$(PublishDir)$(PdAssetsTargetFolder)')">
+		<ZipDirectory SourceDirectory="$(DefaultDataPackageFolder)\config-data" DestinationFile="$(PublishDir)$(PdAssetsTargetFolder)\ConfigData.zip" Overwrite="true" />
+		<Message Text="Configuration Data zipped successfully to $(PublishDir)$(PdAssetsTargetFolder)\ConfigData.zip" Importance="high" />
+	</Target>
+</Project>

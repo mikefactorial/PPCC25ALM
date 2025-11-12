@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
+  <PropertyGroup>
+    <!-- OutputType not needed for NoTargets SDK -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PrettyJsonViewer\PrettyJsonViewer.pcfproj" />
+  </ItemGroup>
+
+</Project>

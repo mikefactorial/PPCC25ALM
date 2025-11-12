@@ -1,0 +1,515 @@
+<entities xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" timestamp="2025-02-14T19:40:15.2117067Z">
+  <entity name="businessunit" displayname="Business Unit">
+    <records>
+      <record id="cc2336d1-3396-ef11-8a69-000d3a4d5939">
+        <field name="businessunitid" value="cc2336d1-3396-ef11-8a69-000d3a4d5939" />
+        <field name="name" value="Child BU Sample" />
+        <field name="isdisabled" value="False" />
+      </record>
+    </records>
+    <m2mrelationships />
+  </entity>
+  <entity name="account" displayname="Account">
+    <records>
+      <record id="d8dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Alpine Ski House" />
+        <field name="websiteurl" value="http://www.alpineskihouse.com/" />
+        <field name="address1_city" value="Missoula" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="TX" />
+        <field name="address1_line1" value="2313 B Southampton Rd" />
+        <field name="address1_postalcode" value="58047" />
+        <field name="telephone1" value="555-0157" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone8@example.com" />
+        <field name="numberofemployees" value="4800" />
+        <field name="revenue" value="90000.0000000000" />
+      </record>
+      <record id="dadc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Fourth Coffee" />
+        <field name="websiteurl" value="http://www.fourthcoffee.com/" />
+        <field name="address1_city" value="Renton" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="TX" />
+        <field name="address1_line1" value="5009 Orange Street" />
+        <field name="address1_postalcode" value="20175" />
+        <field name="telephone1" value="555-0150" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone1@example.com" />
+        <field name="numberofemployees" value="9500" />
+        <field name="revenue" value="100000.0000000000" />
+      </record>
+      <record id="dbdc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Coho Winery" />
+        <field name="websiteurl" value="http://www.cohowinery.com/" />
+        <field name="address1_city" value="Phoenix" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="CA" />
+        <field name="address1_line1" value="137 Lancelot Dr" />
+        <field name="address1_postalcode" value="10032" />
+        <field name="telephone1" value="555-0159" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone10@example.com" />
+        <field name="numberofemployees" value="3900" />
+        <field name="revenue" value="10000.0000000000" />
+      </record>
+      <record id="dedc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="City Power &amp;amp; Light" />
+        <field name="websiteurl" value="http://www.cpandl.com/" />
+        <field name="address1_city" value="Redmond" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="3397 Rancho View Drive" />
+        <field name="address1_postalcode" value="90000" />
+        <field name="telephone1" value="555-0155" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone6@example.com" />
+        <field name="numberofemployees" value="2900" />
+        <field name="revenue" value="100000.0000000000" />
+      </record>
+      <record id="e0dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Contoso Pharmaceuticals" />
+        <field name="websiteurl" value="http://www.contoso.com/" />
+        <field name="address1_city" value="Redmond" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="9906 Oak Grove Road" />
+        <field name="address1_postalcode" value="80803" />
+        <field name="telephone1" value="555-0156" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone7@example.com" />
+        <field name="numberofemployees" value="1500" />
+        <field name="revenue" value="60000.0000000000" />
+      </record>
+      <record id="e2dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Blue Yonder Airlines" />
+        <field name="websiteurl" value="http://www.blueyonderairlines.com/" />
+        <field name="address1_city" value="Los Angeles" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="KA" />
+        <field name="address1_line1" value="9068 Muir Road" />
+        <field name="address1_postalcode" value="20593" />
+        <field name="telephone1" value="555-0154" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone5@example.com" />
+        <field name="numberofemployees" value="2900" />
+        <field name="revenue" value="10000.0000000000" />
+      </record>
+      <record id="e4dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Adventure Works" />
+        <field name="websiteurl" value="http://www.adventure-works.com/" />
+        <field name="address1_city" value="Santa Cruz" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="TX" />
+        <field name="address1_line1" value="4405 Balboa Court" />
+        <field name="address1_postalcode" value="95486" />
+        <field name="telephone1" value="555-0152" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone3@example.com" />
+        <field name="numberofemployees" value="4300" />
+        <field name="revenue" value="60000.0000000000" />
+      </record>
+      <record id="e6dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="name" value="Litware, Inc." />
+        <field name="websiteurl" value="http://www.litwareinc.com/" />
+        <field name="address1_city" value="Dallas" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="TX" />
+        <field name="address1_line1" value="100 Red Oak Lane" />
+        <field name="address1_postalcode" value="20313" />
+        <field name="telephone1" value="555-0151" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone2@example.com" />
+        <field name="numberofemployees" value="6000" />
+        <field name="revenue" value="20000.0000000000" />
+      </record>
+      <record id="41717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="name" value="A. Datum Corporation" />
+        <field name="websiteurl" value="http://www.adatum.com/" />
+        <field name="address1_city" value="Redmond" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="2137 Birchwood Dr" />
+        <field name="address1_postalcode" value="78214" />
+        <field name="telephone1" value="555-0158" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone9@example.com" />
+        <field name="numberofemployees" value="6200" />
+        <field name="revenue" value="10000.0000000000" />
+      </record>
+      <record id="42717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="name" value="Fabrikam, Inc." />
+        <field name="websiteurl" value="http://www.fabrikam.com/" />
+        <field name="address1_city" value="Lynnwood" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="TN" />
+        <field name="address1_line1" value="7995 Edwards Ave." />
+        <field name="address1_postalcode" value="58299" />
+        <field name="telephone1" value="555-0153" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="emailaddress1" value="someone4@example.com" />
+        <field name="numberofemployees" value="2700" />
+        <field name="revenue" value="80000.0000000000" />
+      </record>
+    </records>
+    <m2mrelationships />
+  </entity>
+  <entity name="contact" displayname="Contact">
+    <records>
+      <record id="e8dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Konersmann" />
+        <field name="telephone1" value="555-0105" />
+        <field name="jobtitle" value="Purchasing Manager" />
+        <field name="firstname" value="Scott" />
+        <field name="emailaddress1" value="someone_f@example.com" />
+        <field name="address1_city" value="Issaquah" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="989 Caravelle Ct" />
+        <field name="address1_postalcode" value="33597" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="3" />
+        <field name="birthdate" value="1977-06-17T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Scott Konersmann" />
+      </record>
+      <record id="eadc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Lyon" />
+        <field name="telephone1" value="555-0106" />
+        <field name="jobtitle" value="Owner" />
+        <field name="firstname" value="Robert" />
+        <field name="emailaddress1" value="someone_g@example.com" />
+        <field name="address1_city" value="Snohomish" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7230 Berrellesa Street" />
+        <field name="address1_postalcode" value="78800" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="3" />
+        <field name="birthdate" value="1978-03-12T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Robert Lyon" />
+      </record>
+      <record id="ecdc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Glynn" />
+        <field name="telephone1" value="555-0109" />
+        <field name="jobtitle" value="Owner" />
+        <field name="firstname" value="Jim" />
+        <field name="emailaddress1" value="someone_j@example.com" />
+        <field name="address1_city" value="Renton" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7165 Brock Lane" />
+        <field name="address1_postalcode" value="61795" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="1" />
+        <field name="birthdate" value="1959-03-02T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Jim Glynn" />
+      </record>
+      <record id="eddc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Stubberod" />
+        <field name="telephone1" value="555-0101" />
+        <field name="jobtitle" value="Purchasing Manager" />
+        <field name="firstname" value="Susanna" />
+        <field name="emailaddress1" value="someone_b@example.com" />
+        <field name="address1_city" value="Issaquah" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="5979 El Pueblo" />
+        <field name="address1_postalcode" value="23382" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="2" />
+        <field name="birthdate" value="1989-12-10T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Susanna Stubberod" />
+      </record>
+      <record id="f0dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Burk" />
+        <field name="telephone1" value="555-0111" />
+        <field name="jobtitle" value="Owner" />
+        <field name="firstname" value="Susan" />
+        <field name="emailaddress1" value="someone_l@example.com" />
+        <field name="address1_city" value="Seattle" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="931 Corte De Luna" />
+        <field name="address1_postalcode" value="79465" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="1" />
+        <field name="birthdate" value="1969-01-03T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Susan Burk" />
+      </record>
+      <record id="f1dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Anderson" />
+        <field name="telephone1" value="555-0102" />
+        <field name="jobtitle" value="Purchasing Assistant" />
+        <field name="firstname" value="Nancy" />
+        <field name="emailaddress1" value="someone_c@example.com" />
+        <field name="address1_city" value="Duvall" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="5086 Nottingham Place" />
+        <field name="address1_postalcode" value="16982" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="2" />
+        <field name="birthdate" value="1960-04-22T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Nancy Anderson" />
+      </record>
+      <record id="f4dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Higa" />
+        <field name="telephone1" value="555-0104" />
+        <field name="jobtitle" value="Owner" />
+        <field name="firstname" value="Sidney" />
+        <field name="emailaddress1" value="someone_e@example.com" />
+        <field name="address1_city" value="Issaquah" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7691 Benedict Ct." />
+        <field name="address1_postalcode" value="57065" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="2" />
+        <field name="birthdate" value="1966-03-07T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Sidney Higa" />
+      </record>
+      <record id="f6dc3315-01a4-f011-bbd2-6045bd5ee967">
+        <field name="lastname" value="Campbell" />
+        <field name="telephone1" value="555-0103" />
+        <field name="jobtitle" value="Purchasing Manager" />
+        <field name="firstname" value="Maria" />
+        <field name="emailaddress1" value="someone_d@example.com" />
+        <field name="address1_city" value="Monroe" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="3747 Likins Avenue" />
+        <field name="address1_postalcode" value="37925" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="2" />
+        <field name="birthdate" value="1962-01-14T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Maria Campbell" />
+      </record>
+      <record id="cd9ed84e-23ab-f011-bbd3-6045bd5ee967">
+        <field name="lastname" value="McDavid" />
+        <field name="jobtitle" value="Captain / McJesus" />
+        <field name="firstname" value="Connor" />
+        <field name="emailaddress1" value="connor.mcdavid@oilers.ca" />
+        <field name="address1_city" value="Edmonton" />
+        <field name="address1_country" value="Canada" />
+        <field name="address1_stateorprovince" value="AB" />
+        <field name="transactioncurrencyid" value="da026f96-13a0-f011-bbd2-6045bd5d5e2f" lookupentity="transactioncurrency" lookupentityname="Canadian Dollar" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Connor McDavid" />
+      </record>
+      <record id="45717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="lastname" value="Cannon" />
+        <field name="telephone1" value="555-0107" />
+        <field name="jobtitle" value="Purchasing Assistant" />
+        <field name="firstname" value="Paul" />
+        <field name="emailaddress1" value="someone_h@example.com" />
+        <field name="address1_city" value="Redmond" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7723 Firestone Drive" />
+        <field name="address1_postalcode" value="32147" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="3" />
+        <field name="birthdate" value="1966-07-05T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="True" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Paul Cannon" />
+      </record>
+      <record id="46717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="lastname" value="McKay" />
+        <field name="telephone1" value="555-0100" />
+        <field name="jobtitle" value="Purchasing Manager" />
+        <field name="firstname" value="Yvonne" />
+        <field name="emailaddress1" value="someone_a@example.com" />
+        <field name="address1_city" value="Redmond" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="249 Alexander Pl." />
+        <field name="address1_postalcode" value="86372" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="2" />
+        <field name="birthdate" value="1954-05-16T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Yvonne McKay" />
+      </record>
+      <record id="49717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="lastname" value="Andersen" />
+        <field name="telephone1" value="555-0112" />
+        <field name="jobtitle" value="Purchasing Manager" />
+        <field name="firstname" value="Thomas" />
+        <field name="emailaddress1" value="someone_m@example.com" />
+        <field name="address1_city" value="Seattle" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7842 Ygnacio Valley Road" />
+        <field name="address1_postalcode" value="12150" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="1" />
+        <field name="birthdate" value="1983-04-08T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Thomas Andersen" />
+      </record>
+      <record id="4b717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="lastname" value="Valdes" />
+        <field name="telephone1" value="555-0108" />
+        <field name="jobtitle" value="Purchasing Assistant" />
+        <field name="firstname" value="Rene" />
+        <field name="emailaddress1" value="someone_i@example.com" />
+        <field name="address1_city" value="Seattle" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="4948 West Th St" />
+        <field name="address1_postalcode" value="73683" />
+        <field name="gendercode" value="2" />
+        <field name="familystatuscode" value="1" />
+        <field name="birthdate" value="1984-11-22T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Rene Valdes" />
+      </record>
+      <record id="4d717215-01a4-f011-bbd2-7c1e52548f72">
+        <field name="lastname" value="Sands" />
+        <field name="telephone1" value="555-0110" />
+        <field name="jobtitle" value="Owner" />
+        <field name="firstname" value="Patrick" />
+        <field name="emailaddress1" value="someone_k@example.com" />
+        <field name="address1_city" value="Seattle" />
+        <field name="address1_country" value="U.S." />
+        <field name="address1_stateorprovince" value="WA" />
+        <field name="address1_line1" value="7765 Sunsine Drive" />
+        <field name="address1_postalcode" value="11910" />
+        <field name="gendercode" value="1" />
+        <field name="familystatuscode" value="1" />
+        <field name="birthdate" value="1952-07-02T00:00:00.0000000" />
+        <field name="donotemail" value="False" />
+        <field name="donotbulkemail" value="False" />
+        <field name="donotpostalmail" value="False" />
+        <field name="donotfax" value="False" />
+        <field name="donotphone" value="False" />
+        <field name="preferredcontactmethodcode" value="1" />
+        <field name="fullname" value="Patrick Sands" />
+      </record>
+    </records>
+    <m2mrelationships />
+  </entity>
+</entities>

@@ -1,0 +1,16 @@
+{
+  "entities": [
+    "ppcc_messageoutbox"
+  ],
+  "actions": [
+    "ppcc_ProcessServiceBusMessages",
+    "ppcc_SendServiceBusMessages"
+  ],
+  "functions": [],
+  "generateIndex": true,
+  "generateFormContext": true,
+  "generateEntityTypes": false,
+  "output": {
+    "outputRoot": "./src/dataverse-gen"
+  }
+}

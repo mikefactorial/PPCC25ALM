@@ -1,0 +1,19 @@
+﻿{
+  "emitEntityETC": false,
+  "emitFieldsClasses": true,
+  "emitVirtualAttributes": false,
+  "entityNamesFilter": [
+    "ppcc_messageoutbox"
+  ],
+  "entityTypesFolder": "Entities",
+  "generateGlobalOptionSets": false,
+  "generateSdkMessages": false,
+  "language": "CS",
+  "logLevel": "Info",
+  "messagesTypesFolder": "Messages",
+  "namespace": "ServiceBus.Models",
+  "optionSetsTypesFolder": "OptionSets",
+  "serviceContextName": "XrmContext",
+  "suppressGeneratedCodeAttribute": false,
+  "suppressINotifyPattern": true
+}

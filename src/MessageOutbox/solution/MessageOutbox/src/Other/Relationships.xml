@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="business_unit_ppcc_messageoutbox" />
+  <EntityRelationship Name="lk_ppcc_messageoutbox_createdby" />
+  <EntityRelationship Name="lk_ppcc_messageoutbox_modifiedby" />
+  <EntityRelationship Name="owner_ppcc_messageoutbox" />
+  <EntityRelationship Name="team_ppcc_messageoutbox" />
+  <EntityRelationship Name="user_ppcc_messageoutbox" />
+</EntityRelationships>

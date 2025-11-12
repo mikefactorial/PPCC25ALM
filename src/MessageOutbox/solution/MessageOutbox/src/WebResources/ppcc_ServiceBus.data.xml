@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebResource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <WebResourceId>{e4ef3c3b-deab-f011-bbd3-6045bd5eea76}</WebResourceId>
+  <Name>ppcc_ServiceBus</Name>
+  <DisplayName>Service-Bus</DisplayName>
+  <WebResourceType>11</WebResourceType>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsEnabledForMobileClient>1</IsEnabledForMobileClient>
+  <IsAvailableForMobileOffline>0</IsAvailableForMobileOffline>
+  <IsCustomizable>1</IsCustomizable>
+  <CanBeDeleted>1</CanBeDeleted>
+  <IsHidden>0</IsHidden>
+  <FileName>/WebResources/ppcc_ServiceBusE4EF3C3B-DEAB-F011-BBD3-6045BD5EEA76</FileName>
+</WebResource>

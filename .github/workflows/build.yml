@@ -1,0 +1,665 @@
+name: Build
+
+permissions:
+  id-token: write
+  packages: write
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      forceRebuild:
+        description: 'Force rebuild even if there are no changes'
+        required: false
+        type: boolean
+        default: false
+
+  # Run build on pull requests but don't create a release yet
+  pull_request:
+    branches-ignore:
+      - release/*
+      - releases/*
+
+  # Run build on push to a release branch
+  push:
+    branches:
+      - main
+      - release/*
+      - releases/*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  # Phase 1: Calculate versions using semantic-version action (matrix for parallel execution)
+  Calculate-Versions:
+    runs-on: windows-latest
+    name: Calculate ${{ matrix.solutionName }} Version
+    strategy:
+      matrix:
+        include: ${{ fromJson(vars.SOLUTIONS_CONFIG) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Semantic Versioning
+        uses: paulhatch/semantic-version@v5.3.0
+        id: get_version
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR-${{ matrix.solutionName }})"
+          minor_pattern: "(MINOR-${{ matrix.solutionName }})"
+          namespace: "${{ matrix.solutionName }}"
+          change_path: "${{ matrix.changeScope }}"
+          user_format_type: "csv"
+          debug: true
+
+      - name: Save Version Info
+        run: |
+          # Create custom tag format: v0.0.1-SolutionName instead of vSolutionName-0.0.1
+          $version = "${{ steps.get_version.outputs.version }}"
+          $customTag = "v$version-${{ matrix.solutionName }}"
+          
+          $versionInfo = @{
+            solutionName = "${{ matrix.solutionName }}"
+            version = "${{ steps.get_version.outputs.version }}"
+            versionTag = $customTag
+            major = "${{ steps.get_version.outputs.major }}"
+            minor = "${{ steps.get_version.outputs.minor }}"
+            patch = "${{ steps.get_version.outputs.patch }}"
+            increment = "${{ steps.get_version.outputs.increment }}"
+            changed = "${{ steps.get_version.outputs.changed }}"
+            changeScope = "${{ matrix.changeScope }}"
+            solutionSubFolder = "${{ matrix.solutionSubFolder }}"
+          }
+
+          $versionInfo | ConvertTo-Json | Out-File -FilePath "version-info-${{ matrix.solutionName }}.json"
+
+          Write-Host "Solution: ${{ matrix.solutionName }}"
+          Write-Host "  Version: ${{ steps.get_version.outputs.version }}"
+          Write-Host "  Tag: $customTag"
+          Write-Host "  Changed: ${{ steps.get_version.outputs.changed }}"
+          Write-Host "  Increment: ${{ steps.get_version.outputs.increment }}"
+        shell: pwsh
+
+      - name: Upload Version Info
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-info-${{ matrix.solutionName }}
+          path: version-info-${{ matrix.solutionName }}.json
+          retention-days: 1
+
+  Build:
+    needs: Calculate-Versions
+    runs-on: windows-latest
+    name: Build All Solutions and Package
+    environment: solution-checker
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install pac
+        uses: microsoft/powerplatform-actions/actions-install@v1
+        with:
+          add-tools-to-path: true
+
+      # Download all version info artifacts from Calculate-Versions job
+      - name: Download All Version Info
+        uses: actions/download-artifact@v4
+        with:
+          pattern: version-info-*
+          path: version-info
+
+      # Consolidate version info and determine if build is needed
+      - name: Consolidate Version Information
+        id: calc_versions
+        run: |
+          $versionFiles = Get-ChildItem -Path "version-info" -Recurse -Filter "*.json"
+
+          $allVersionInfo = @()
+          $hasAnyChanges = $false
+          $highestBump = "none"
+          $highestBumpLevel = 0
+
+          $bumpLevels = @{
+            major = 3
+            minor = 2
+            patch = 1
+            none = 0
+          }
+
+          echo "## 📋 Solution Version Calculation" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Solution | Version | Changed | Bump |" >> $env:GITHUB_STEP_SUMMARY
+          echo "|----------|---------|---------|------|" >> $env:GITHUB_STEP_SUMMARY
+
+          foreach ($file in $versionFiles) {
+            $versionInfo = Get-Content $file.FullName | ConvertFrom-Json
+            $allVersionInfo += $versionInfo
+
+            Write-Host "Solution: $($versionInfo.solutionName), Version: $($versionInfo.version), Changed: $($versionInfo.changed), Increment: $($versionInfo.increment)"
+
+            # Check if there are changes or force rebuild
+            if ($versionInfo.changed -eq "true" -or "${{ github.event.inputs.forceRebuild }}" -eq "true") {
+              $hasAnyChanges = $true
+
+              # Track highest bump
+              $bumpLevel = $bumpLevels[$versionInfo.increment.ToLower()]
+              if ($bumpLevel -gt $highestBumpLevel) {
+                $highestBumpLevel = $bumpLevel
+                $highestBump = $versionInfo.increment.ToLower()
+              }
+            }
+
+            # Add to summary
+            $changedIcon = if ($versionInfo.changed -eq "true") { "✅" } else { "⬜" }
+            echo "| $($versionInfo.solutionName) | $($versionInfo.version) | $changedIcon | $($versionInfo.increment.ToUpper()) |" >> $env:GITHUB_STEP_SUMMARY
+          }
+
+          # Save all version info to file for later steps
+          $allVersionInfo | ConvertTo-Json | Out-File -FilePath "all-solution-versions.json"
+
+          # Set outputs
+          $hasAnyChangesStr = $hasAnyChanges.ToString().ToLower()
+          echo "has_changes=$hasAnyChangesStr" >> $env:GITHUB_OUTPUT
+          echo "highest_bump=$highestBump" >> $env:GITHUB_OUTPUT
+
+          Write-Host ""
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host "Summary:" -ForegroundColor Cyan
+          Write-Host "  Has Any Changes: $hasAnyChanges" -ForegroundColor Yellow
+          Write-Host "  Highest Bump: $highestBump" -ForegroundColor Yellow
+          Write-Host "========================================" -ForegroundColor Cyan
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Has Changes:** $hasAnyChanges" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Highest Bump Type:** $($highestBump.ToUpper())" >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      # Phase 2: Calculate package version
+      - name: Calculate Package Version
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        id: package_version
+        run: |
+          # Use git to calculate package version
+          $namespace = "package"
+
+          # Get the latest package tag
+          $latestTag = git tag -l "v$namespace-*" --sort=-version:refname | Select-Object -First 1
+
+          if ($latestTag) {
+            Write-Host "Latest package tag: $latestTag"
+            if ($latestTag -match "v$namespace-(\d+)\.(\d+)\.(\d+)") {
+              $major = [int]$matches[1]
+              $minor = [int]$matches[2]
+              $patch = [int]$matches[3]
+            } else {
+              $major = 1; $minor = 0; $patch = 0
+            }
+          } else {
+            Write-Host "No existing package tags found, starting at 1.0.0"
+            $major = 1
+            $minor = 0
+            $patch = 0
+          }
+
+          # Apply highest bump from solutions
+          $highestBump = "${{ steps.calc_versions.outputs.highest_bump }}"
+          switch ($highestBump) {
+            "major" { $major++; $minor = 0; $patch = 0 }
+            "minor" { $minor++; $patch = 0 }
+            default { $patch++ }
+          }
+
+          $version = "$major.$minor.$patch"
+          $versionTag = "v$version-PackageCore"
+
+          Write-Host "Package Version: $version" -ForegroundColor Green
+          Write-Host "Package Tag: $versionTag" -ForegroundColor Green
+
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "version_tag=$versionTag" >> $env:GITHUB_OUTPUT
+          echo "major=$major" >> $env:GITHUB_OUTPUT
+          echo "minor=$minor" >> $env:GITHUB_OUTPUT
+          echo "patch=$patch" >> $env:GITHUB_OUTPUT
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 📦 Package Version" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Version:** $version" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Tag:** $versionTag" >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      # Phase 3: Update all solution file versions
+      - name: Update Solution File Versions
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          # Load all solution version info
+          $allVersions = Get-Content "all-solution-versions.json" | ConvertFrom-Json
+
+          echo "## 📝 Updating Solution Files" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+
+          foreach ($sol in $allVersions) {
+            if ($sol.changed -eq "false" -and "${{ github.event.inputs.forceRebuild }}" -ne "true") {
+              Write-Host "Skipping $($sol.solutionName) - no changes" -ForegroundColor Yellow
+              continue
+            }
+
+            Write-Host ""
+            Write-Host "========================================" -ForegroundColor Cyan
+            Write-Host "Updating files for: $($sol.solutionName)" -ForegroundColor Cyan
+            Write-Host "========================================" -ForegroundColor Cyan
+
+            $major = $sol.major
+            $minor = $sol.minor
+            $patch = $sol.patch
+            $increment = 0  # For plugins/PCF, we use increment as 0 for consistency
+            $path = "${{ github.workspace }}/$($sol.changeScope)"
+
+            function UpdateFileContent($fileFilter, $matchPattern, $replacePattern) {
+                Write-Host "  Updating: $fileFilter" -ForegroundColor Gray
+                $filesToUpdate = Get-ChildItem -Path $path -Recurse -Filter $fileFilter -ErrorAction SilentlyContinue
+                foreach ($file in $filesToUpdate) {
+                    Write-Host "    - $($file.FullName)" -ForegroundColor DarkGray
+                    $content = Get-Content -Path $file.FullName -Raw
+                    $updatedContent = $content -replace $matchPattern, $replacePattern
+                    Set-Content -Path $file.FullName -Value $updatedContent
+                }
+            }
+
+            # Update AssemblyVersion in .csproj files
+            UpdateFileContent "*.csproj" "<AssemblyVersion>[0-9]+(\.[0-9]+)*</AssemblyVersion>" "<AssemblyVersion>$major.$minor.$patch.$increment</AssemblyVersion>"
+
+            # Update .dll.data.xml files (plugin registration)
+            UpdateFileContent "*.dll.data.xml" ' Version=[0-9]+(\.[0-9]+)*,' " Version=$major.$minor.$patch.$increment,"
+
+            # Update RootComponents in Solution.xml
+            UpdateFileContent "Solution.xml" '(?<=<RootComponent type="91"[^>]*?Version=)[0-9]+(\.[0-9]+)*,' "$major.$minor.$patch.$increment,"
+
+            # Update ControlManifest.Input.xml for PCF controls
+            # PCF controls use standard semantic versioning: major.minor.patch
+            UpdateFileContent "ControlManifest.Input.xml" '(?<!(resx" )|(css" )|(React" )|(Fluent" )|(xml ))version="[0-9]+(\.[0-9]+)*"' "version=""$major.$minor.$patch"""
+
+            # Update Solution.xml version
+            UpdateFileContent "Solution.xml" "<Version>[0-9]+(\.[0-9]+)*</Version>" "<Version>$major.$minor.$patch.$increment</Version>"
+
+            Write-Host "  ✅ Updated all files for $($sol.solutionName) to version $major.$minor.$patch.$increment" -ForegroundColor Green
+            echo "- ✅ $($sol.solutionName): $major.$minor.$patch.$increment" >> $env:GITHUB_STEP_SUMMARY
+          }
+        shell: pwsh
+
+      # Phase 4: Build and publish package project (which builds all solution projects)
+      - name: Build Package with All Solutions
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          Write-Host "Building package project (this will build all referenced solution projects)..." -ForegroundColor Cyan
+
+          # Build the package project - this will trigger builds of all referenced .cdsproj files
+          dotnet publish src/packages/core/PPCC.ALM.Packages.Core.csproj `
+            --configuration Release `
+            -p:Version=${{ steps.package_version.outputs.version }} `
+            -o publish
+
+          Write-Host "✅ Package and all solutions built successfully" -ForegroundColor Green
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 🔨 Build Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "✅ Package project built successfully" >> $env:GITHUB_STEP_SUMMARY
+          echo "✅ All solution projects built as part of package" >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      # Phase 5: Create package zip
+      - name: Create Package Zip
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          $packageName = "PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.zip"
+          Compress-Archive -Path "publish/*" -DestinationPath $packageName -Force
+          Write-Host "Package created: $packageName" -ForegroundColor Green
+        shell: pwsh
+
+      - name: Upload Package Artifact
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package-${{ steps.package_version.outputs.version }}
+          path: PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.zip
+          retention-days: 90
+
+      # Phase 6: Copy individual solution zips from build output
+      - name: Copy Individual Solutions
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          # Load all solution version info
+          $allVersions = Get-Content "all-solution-versions.json" | ConvertFrom-Json
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 📦 Solution Packages" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+
+          foreach ($sol in $allVersions) {
+            if ($sol.changed -eq "false" -and "${{ github.event.inputs.forceRebuild }}" -ne "true") {
+              Write-Host "Skipping packaging for $($sol.solutionName) - no changes" -ForegroundColor Yellow
+              continue
+            }
+
+            Write-Host ""
+            Write-Host "Copying solution: $($sol.solutionName)" -ForegroundColor Cyan
+
+            # Copy the built solution zip from publish output
+            $sourceZip = "${{ github.workspace }}/publish/PkgAssets/$($sol.solutionName).zip"
+            $outputZip = "${{ github.workspace }}/$($sol.solutionName)_$($sol.version).zip"
+
+            if (Test-Path $sourceZip) {
+              Copy-Item -Path $sourceZip -Destination $outputZip -Force
+              Write-Host "✅ Created: $outputZip" -ForegroundColor Green
+              echo "- ✅ $($sol.solutionName) v$($sol.version)" >> $env:GITHUB_STEP_SUMMARY
+            } else {
+              Write-Host "❌ Source zip not found: $sourceZip" -ForegroundColor Red
+              exit 1
+            }
+          }
+        shell: pwsh
+
+      # Phase 7: Upload individual solution artifacts
+      - name: Upload Solution Artifacts
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          $allVersions = Get-Content "all-solution-versions.json" | ConvertFrom-Json
+
+          foreach ($sol in $allVersions) {
+            if ($sol.changed -eq "false" -and "${{ github.event.inputs.forceRebuild }}" -ne "true") {
+              continue
+            }
+
+            $zipFile = "${{ github.workspace }}/$($sol.solutionName)_$($sol.version).zip"
+            if (Test-Path $zipFile) {
+              Write-Host "Artifact prepared for upload: $zipFile" -ForegroundColor Green
+            }
+          }
+        shell: pwsh
+
+      - name: Upload Solution Packages
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: solution-packages
+          path: |
+            *.zip
+            !PPCC-ALM-Package_*.zip
+          retention-days: 90
+
+      # Phase 8: Run Solution Checker
+      - name: Auth pac for Solution Checker
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          pac auth create --githubFederated `
+            --tenant ${{ secrets.PAC_TENANT_ID }} `
+            --applicationId ${{ secrets.PAC_CLIENT_ID }} `
+            --environment ${{ secrets.PAC_ENV_URL }}
+        shell: pwsh
+
+      - name: Run Solution Checker
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        continue-on-error: true
+        run: |
+          $allVersions = Get-Content "all-solution-versions.json" | ConvertFrom-Json
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 🔍 Solution Checker Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+
+          $allPassed = $true
+
+          foreach ($sol in $allVersions) {
+            if ($sol.changed -eq "false" -and "${{ github.event.inputs.forceRebuild }}" -ne "true") {
+              continue
+            }
+
+            Write-Host ""
+            Write-Host "Running Solution Checker on: $($sol.solutionName)" -ForegroundColor Cyan
+
+            $solutionZip = "${{ github.workspace }}/$($sol.solutionName)_$($sol.version).zip"
+            $outputDir = "${{ github.workspace }}/checker-results/$($sol.solutionName)"
+
+            if (Test-Path $outputDir) {
+              Remove-Item -Path $outputDir -Recurse -Force
+            }
+
+            try {
+              pac solution check `
+                --path $solutionZip `
+                --geo UnitedStates `
+                --outputDirectory $outputDir `
+                --excludedFiles bundle.js
+
+              Write-Host "✅ Solution Checker passed for $($sol.solutionName)" -ForegroundColor Green
+              echo "- ✅ $($sol.solutionName): Passed" >> $env:GITHUB_STEP_SUMMARY
+            } catch {
+              Write-Host "⚠️ Solution Checker found issues for $($sol.solutionName)" -ForegroundColor Yellow
+              echo "- ⚠️ $($sol.solutionName): Issues found (see artifacts)" >> $env:GITHUB_STEP_SUMMARY
+              $allPassed = $false
+            }
+          }
+        shell: pwsh
+
+      - name: Upload Solution Checker Results
+        if: steps.calc_versions.outputs.has_changes == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solution-checker-results
+          path: checker-results/
+          retention-days: 30
+
+      # Phase 9: Run unit tests
+      - name: Run Unit Tests
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          $allVersions = Get-Content "all-solution-versions.json" | ConvertFrom-Json
+
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 🧪 Test Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+
+          $foundTests = $false
+
+          foreach ($sol in $allVersions) {
+            if ($sol.changed -eq "false" -and "${{ github.event.inputs.forceRebuild }}" -ne "true") {
+              continue
+            }
+
+            Write-Host ""
+            Write-Host "Looking for tests in: $($sol.changeScope)" -ForegroundColor Cyan
+
+            # Find test projects
+            $testProjects = Get-ChildItem -Path "${{ github.workspace }}/$($sol.changeScope)" -Recurse -Filter "*Tests.csproj" -ErrorAction SilentlyContinue
+
+            if ($testProjects.Count -eq 0) {
+              $testProjects = Get-ChildItem -Path "${{ github.workspace }}/$($sol.changeScope)" -Recurse -Filter "*Test.csproj" -ErrorAction SilentlyContinue
+            }
+
+            if ($testProjects.Count -gt 0) {
+              $foundTests = $true
+              foreach ($testProj in $testProjects) {
+                Write-Host "Running tests: $($testProj.Name)" -ForegroundColor Cyan
+
+                dotnet test $testProj.FullName `
+                  --configuration Release `
+                  --logger "trx;LogFileName=$($sol.solutionName)-test-results.trx" `
+                  --results-directory "TestResults"
+
+                Write-Host "✅ Tests completed for $($testProj.Name)" -ForegroundColor Green
+                echo "- ✅ $($sol.solutionName): Tests passed" >> $env:GITHUB_STEP_SUMMARY
+              }
+            } else {
+              Write-Host "No test projects found for $($sol.solutionName)" -ForegroundColor Yellow
+              echo "- ⚪ $($sol.solutionName): No tests found" >> $env:GITHUB_STEP_SUMMARY
+            }
+          }
+
+          if (-not $foundTests) {
+            Write-Host "No test projects found in any solution" -ForegroundColor Yellow
+          }
+        shell: pwsh
+
+      - name: Upload Test Results
+        if: steps.calc_versions.outputs.has_changes == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 30
+
+      # Phase 10: Create releases (only on non-PR pushes)
+      - name: Create Releases
+        if: |
+          steps.calc_versions.outputs.has_changes == 'true' &&
+          github.event_name != 'pull_request' &&
+          (startsWith(github.ref, 'refs/heads/release') || github.ref == 'refs/heads/main')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Load version info
+            const allVersions = JSON.parse(fs.readFileSync('all-solution-versions.json', 'utf8'));
+
+            console.log('## Creating Releases');
+
+            // Create individual solution releases
+            for (const sol of allVersions) {
+              if (sol.changed !== 'true' && '${{ github.event.inputs.forceRebuild }}' !== 'true') {
+                console.log(`Skipping ${sol.solutionName} - no changes`);
+                continue;
+              }
+
+              console.log(`\nCreating release for ${sol.solutionName} ${sol.version}`);
+
+              // Check if release already exists
+              const { data: releases } = await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+
+              const existing = releases.find(r => r.tag_name === sol.versionTag && !r.draft);
+              if (existing) {
+                console.log(`Release ${sol.versionTag} already exists and is published. Skipping.`);
+                continue;
+              }
+
+              // Create release
+              const { data: release } = await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: sol.versionTag,
+                name: sol.versionTag,
+                body: `## ${sol.solutionName} Release ${sol.version}
+
+            **Version Bump:** ${sol.increment.toUpperCase()}
+
+            **Built from:**
+            - Commit: ${context.sha}
+            - Branch: ${context.ref}
+
+            ---
+            🤖 Generated by GitHub Actions`,
+                draft: false,
+                prerelease: false
+              });
+
+              console.log(`✅ Created draft release: ${release.html_url}`);
+            }
+
+            // Create package release
+            const packageVersion = '${{ steps.package_version.outputs.version }}';
+            const packageTag = '${{ steps.package_version.outputs.version_tag }}';
+            const packageFile = `PPCC-ALM-Package_${packageVersion}.zip`;
+            const highestBump = '${{ steps.calc_versions.outputs.highest_bump }}';
+
+            const solutionList = allVersions
+              .filter(s => s.changed === 'true' || '${{ github.event.inputs.forceRebuild }}' === 'true')
+              .map(s => `- ${s.solutionName} v${s.version} (${s.increment})`)
+              .join('\n');
+
+            const releaseBody = `## Deployment Package ${packageVersion}
+
+            **Version Bump:** ${highestBump.toUpperCase()}
+
+            **Included Solutions:**
+            ${solutionList}
+
+            **Built from:**
+            - Commit: ${context.sha}
+            - Branch: ${context.ref}
+
+            **How to deploy:**
+            1. Download the package zip
+            2. Use Package Deployer or Power Platform CLI
+            3. Solutions will be imported in the correct order
+
+            ---
+            🤖 Generated by GitHub Actions`;
+
+            console.log(`\nCreating package release ${packageVersion}`);
+
+            const { data: packageRelease } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: packageTag,
+              name: packageTag,
+              body: releaseBody,
+              draft: false,
+              prerelease: false
+            });
+
+            console.log(`✅ Created draft package release: ${packageRelease.html_url}`);
+
+            // Upload package zip as release asset
+            if (fs.existsSync(packageFile)) {
+              const uploadResponse = await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: packageRelease.id,
+                name: packageFile,
+                data: fs.readFileSync(packageFile)
+              });
+              console.log(`✅ Uploaded package: ${uploadResponse.data.browser_download_url}`);
+            }
+
+      # Final summary
+      - name: Build Complete Summary
+        if: steps.calc_versions.outputs.has_changes == 'true'
+        run: |
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "---" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## 🎉 Build Complete!" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Package Version:** ${{ steps.package_version.outputs.version }}" >> $env:GITHUB_STEP_SUMMARY
+          echo "**Package Tag:** ${{ steps.package_version.outputs.version_tag }}" >> $env:GITHUB_STEP_SUMMARY
+
+          if ("${{ github.event_name }}" -ne "pull_request") {
+            echo "" >> $env:GITHUB_STEP_SUMMARY
+            echo "All draft releases have been created. Review and publish when ready." >> $env:GITHUB_STEP_SUMMARY
+          }
+        shell: pwsh
+
+      - name: No Changes Summary
+        if: steps.calc_versions.outputs.has_changes == 'false'
+        run: |
+          echo "## ℹ️ No Changes Detected" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "No solutions have changes since their last tagged version." >> $env:GITHUB_STEP_SUMMARY
+          echo "Build skipped." >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh

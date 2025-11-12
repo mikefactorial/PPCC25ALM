@@ -1,0 +1,5 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)build/Dataverse.Cdsproj.targets"
+          Condition="'$(MSBuildProjectExtension)' == '.cdsproj' AND
+                     Exists('$(MSBuildThisFileDirectory)build/Dataverse.Cdsproj.targets')" />
+</Project>

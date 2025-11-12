@@ -1,0 +1,254 @@
+name: deploy-package
+
+permissions:
+    id-token: write
+    packages: write
+    contents: write
+on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: 'Target environment to deploy to'
+                required: true
+                type: string
+            packageName:
+                description: 'Name of the package to deploy'
+                required: true
+                type: string
+            overrideVersionTag:
+                description: 'Specific release tag to deploy (optional - defaults to latest)'
+                required: false
+                type: string
+    workflow_call:
+        inputs:
+            environment:
+                required: true
+                type: string
+            packageName:
+                required: true
+                type: string
+            overrideVersionTag:
+                required: false
+                type: string # rather than using the latest release - use a specific release as defined by it's tag
+
+jobs:
+    deploy:
+        runs-on: windows-latest
+        environment: ${{ inputs.environment }}
+        name: deploy-${{ inputs.packageName }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Install semver
+              run: npm install semver
+
+            - name: Get Most Recent Release Matching Regex
+              id: get_release
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const path = require('path');
+                      const semver = require('semver');
+                      const packageName = '${{ inputs.packageName }}';
+                      const overrideVersionTag = '${{ inputs.overrideVersionTag }}';
+                      // Use the overrideVersionTag if it is provided - otherwise the regex will use the solution name
+                      const regexPattern = overrideVersionTag ? `^${overrideVersionTag}$` : `^v\\d+\\.\\d+\\.\\d+(-${packageName})$`;
+                      console.log(regexPattern);
+                      const regex = new RegExp(regexPattern);
+                      const { data: releases } = await github.rest.repos.listReleases({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                      });
+                      console.log(`Found ${releases.length} releases.`);
+
+                      const matchingReleases = releases.filter(release => !release.draft && regex.test(release.tag_name));
+                      console.log(`Found ${matchingReleases.length} matching releases.`);
+                      const mostRecentRelease = matchingReleases.sort((a, b) => semver.compare(a.tag_name, b.tag_name)).pop();
+
+                      if (mostRecentRelease) {
+                          core.setOutput('release_id', mostRecentRelease.id);
+                          core.setOutput('tag_name', mostRecentRelease.tag_name);
+                          console.log(`Found release: ${mostRecentRelease.tag_name}`);
+
+                          // Create folder for release assets
+                          fs.mkdirSync(packageName, { recursive: true });
+
+                          // Download the release assets using a for...of loop
+                          for (const asset of mostRecentRelease.assets) {
+                          const assetData = await github.request('GET ' + asset.url, {
+                              headers: {
+                              Accept: 'application/octet-stream',
+                              },
+                          });
+                          const outputPath = path.join(process.env.GITHUB_WORKSPACE, packageName, asset.name);
+                          fs.writeFileSync(outputPath, Buffer.from(assetData.data));
+                          console.log(`Downloaded ${asset.name} to ${outputPath}`);
+                          }
+                      } else {
+                          core.setFailed('No matching release found.');
+                      }
+
+            - name: Install pac
+              uses: microsoft/powerplatform-actions/actions-install@v1
+              with:
+                  add-tools-to-path: true
+
+            - name: Auth pac
+              run: |
+                  pac auth create --githubFederated --tenant ${{ secrets.PAC_TENANT_ID }} --applicationId ${{ secrets.PAC_CLIENT_ID }} --environment ${{ secrets.PAC_ENV_URL }}
+              shell: pwsh
+
+            - name: Build Deployment Settings
+              id: build_settings
+              run: |
+                  # Parse the deployConfig from environment variable
+                  $deployConfig = '${{ vars.DEPLOY_CONFIG }}' | ConvertFrom-Json
+
+                  Write-Host "Parsing deployment configuration..." -ForegroundColor Cyan
+
+                  $settingsParts = @()
+
+                  # Process each solution's deployment settings
+                  foreach ($solutionName in $deployConfig.PSObject.Properties.Name) {
+                      $solution = $deployConfig.$solutionName
+
+                      # Skip non-solution properties like EnvironmentSettings
+                      if ($solutionName -eq "EnvironmentSettings") {
+                          continue
+                      }
+
+                      Write-Host "Processing solution: $solutionName" -ForegroundColor Yellow
+
+                      # Check if solution has deploymentSettings
+                      if ($solution.deploymentSettings) {
+                          # Convert deploymentSettings to JSON
+                          $deploymentSettingsJson = $solution.deploymentSettings | ConvertTo-Json -Compress -Depth 10
+
+                          Write-Host "  Deployment Settings JSON: $deploymentSettingsJson" -ForegroundColor Gray
+
+                          # Convert to base64
+                          $bytes = [System.Text.Encoding]::UTF8.GetBytes($deploymentSettingsJson)
+                          $base64 = [System.Convert]::ToBase64String($bytes)
+
+                          Write-Host "  Base64: $base64" -ForegroundColor Gray
+
+                          # Add to settings parts with solution unique name format
+                          $settingsParts += "${solutionName}_deploymentsettings=$base64"
+
+                          Write-Host "  ✅ Added deployment settings for $solutionName" -ForegroundColor Green
+                      } else {
+                          Write-Host "  ⚠️ No deployment settings found for $solutionName" -ForegroundColor Yellow
+                      }
+
+                      # Check if solution has ManagedIdentities
+                      if ($solution.ManagedIdentities -and $solution.ManagedIdentities.Count -gt 0) {
+                          Write-Host "  Processing $($solution.ManagedIdentities.Count) managed identity/identities" -ForegroundColor Yellow
+
+                          # Add SolutionName property to each managed identity
+                          $managedIdentitiesWithSolution = @()
+                          foreach ($mi in $solution.ManagedIdentities) {
+                              $managedIdentitiesWithSolution += @{
+                                  Name = $mi.name
+                                  ApplicationId = $mi.applicationid
+                                  TenantId = $mi.tenantid
+                                  SolutionName = $solutionName
+                              }
+                          }
+
+                          # Convert to JSON - force array output even for single items
+                          $managedIdentitiesJson = ConvertTo-Json -InputObject @($managedIdentitiesWithSolution) -Compress -Depth 10
+
+                          Write-Host "  Managed Identities JSON: $managedIdentitiesJson" -ForegroundColor Gray
+
+                          # Convert to base64
+                          $miBytes = [System.Text.Encoding]::UTF8.GetBytes($managedIdentitiesJson)
+                          $miBase64 = [System.Convert]::ToBase64String($miBytes)
+
+                          Write-Host "  Base64 (first 50 chars): $($miBase64.Substring(0, [Math]::Min(50, $miBase64.Length)))..." -ForegroundColor Gray
+
+                          # Add to settings parts
+                          $settingsParts += "${solutionName}_managedidentities=$miBase64"
+
+                          Write-Host "  ✅ Added managed identities for $solutionName" -ForegroundColor Green
+                      } else {
+                          Write-Host "  ℹ️  No managed identities for $solutionName" -ForegroundColor DarkGray
+                      }
+                  }
+
+                  # Process EnvironmentSettings if they exist
+                  if ($deployConfig.EnvironmentSettings) {
+                      Write-Host "Processing environment settings..." -ForegroundColor Yellow
+
+                      foreach ($property in $deployConfig.EnvironmentSettings.PSObject.Properties) {
+                          $key = $property.Name
+                          $value = $property.Value
+
+                          # Replace first underscore with colon for runtime settings format
+                          # Package Deployer expects ENVSETTING:key format, not ENVSETTING_key
+                          $underscoreIndex = $key.IndexOf('_')
+                          if ($underscoreIndex -ge 0) {
+                              $formattedKey = $key.Substring(0, $underscoreIndex) + ':' + $key.Substring($underscoreIndex + 1)
+                          } else {
+                              $formattedKey = $key
+                          }
+
+                          Write-Host "  $formattedKey = $value" -ForegroundColor Gray
+
+                          # Add to settings parts
+                          $settingsParts += "$formattedKey=$value"
+
+                          Write-Host "  ✅ Added environment setting: $formattedKey" -ForegroundColor Green
+                      }
+                  }
+
+                  # Join all settings parts with pipe separator
+                  $settingsString = $settingsParts -join '|'
+
+                  Write-Host "" -ForegroundColor Cyan
+                  Write-Host "========================================" -ForegroundColor Cyan
+                  Write-Host "Final Settings String:" -ForegroundColor Cyan
+                  Write-Host $settingsString -ForegroundColor White
+                  Write-Host "========================================" -ForegroundColor Cyan
+
+                  # Output for next step
+                  echo "settings=$settingsString" >> $env:GITHUB_OUTPUT
+              shell: pwsh
+
+            - name: Deploy pac package
+              run: |
+                  $packageFile = Get-ChildItem -Path "${{ inputs.packageName }}" -Filter "*.pdpkg" | Select-Object -First 1
+
+                  if (-not $packageFile) {
+                      Write-Error "No .pdpkg file found in ${{ inputs.packageName }} directory"
+                      exit 1
+                  }
+
+                  Write-Host "Deploying package: $($packageFile.FullName)" -ForegroundColor Cyan
+                  Write-Host "Environment: ${{ secrets.PAC_ENV_URL }}" -ForegroundColor Cyan
+                  Write-Host "Settings: ${{ steps.build_settings.outputs.settings }}" -ForegroundColor Cyan
+                  Write-Host ""
+
+                  # Use cmd.exe to execute pac package deploy to properly handle pipe characters in settings
+                  $envUrl = "${{ secrets.PAC_ENV_URL }}"
+                  $packagePath = $packageFile.FullName
+                  $settings = "${{ steps.build_settings.outputs.settings }}"
+
+                  $cmdCommand = "pac package deploy --environment `"$envUrl`" --package `"$packagePath`" --settings `"$settings`" --logConsole --verbose"
+
+                  Write-Host "Executing via cmd.exe:" -ForegroundColor Gray
+                  Write-Host "cmd.exe /c `"$cmdCommand`"" -ForegroundColor DarkGray
+                  Write-Host ""
+
+                  & cmd.exe /c $cmdCommand
+
+                  if ($LASTEXITCODE -ne 0) {
+                      Write-Error "Package deployment failed with exit code: $LASTEXITCODE"
+                      exit $LASTEXITCODE
+                  }
+
+                  Write-Host ""
+                  Write-Host "✅ Package deployed successfully" -ForegroundColor Green
+              shell: pwsh
+

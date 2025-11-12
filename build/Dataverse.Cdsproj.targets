@@ -1,0 +1,190 @@
+<!--
+Credit to Betim Beja as this file is based on albanian-xrm/CSDPROJ-SDK. 
+  Original file:
+https://github.com/albanian-xrm/CSDPROJ-SDK/blob/main/AlbanianXrm.CDSProj.Sdk/Sdk/Sdk.targets
+-->
+
+<!--
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  
+  Licensed under the MIT license.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <PackageReference Include="Microsoft.PowerApps.MSBuild.Solution" Version="1.*" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0"
+            PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ExcludeDirectories Include=".vs" />
+        <ExcludeDirectories Include=".gitignore" />
+        <ExcludeDirectories Include="bin\**" />
+        <ExcludeDirectories Include="obj\**" />
+        <ExcludeDirectories Include="*.cdsproj" />
+        <ExcludeDirectories Include="*.cdsproj.user" />
+        <ExcludeDirectories Include="*.sln" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="./**" Exclude="@(ExcludeDirectories)" />
+        <None Remove="@(ExcludeDirectories)" />
+        <None Remove=".vs/**" />
+        <None Remove="$(SolutionRootPath)/**" />
+        <None Include="$(SolutionRootPath)/**">
+            <Link>Dataverse Solution\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+        </None>
+        <None Remove="bin\**" />
+        <Content Include="$(SolutionPackageZipFilePath)">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Remove="@(ExcludeDirectories)" />
+        <Content Remove="bin\**" />
+    </ItemGroup>
+
+
+    <Target Name="CopyPluginPackages"
+        Outputs="%(DataversePluginPackage.Identity)"
+        BeforeTargets="CopyCdsSolutionContent"
+        Condition="'@(DataversePluginPackage)' != ''">
+
+        <PropertyGroup>
+            <!-- Get the directory where the plugin project is located -->
+            <_PluginProjectDir>$([System.IO.Path]::GetDirectoryName(%(DataversePluginPackage.Identity)))</_PluginProjectDir>
+            <!-- Build the expected nupkg path: {ProjectDir}\bin\{Configuration}\{PackageId}.*.nupkg -->
+            <_NupkgSearchPattern>$(_PluginProjectDir)\bin\$(Configuration)\%(DataversePluginPackage.DataversePluginPackageId).*.nupkg</_NupkgSearchPattern>
+            <!-- Destination path -->
+            <_DestinationPath>$(SolutionRootPath)\pluginpackages\$(PublisherPrefix)_%(DataversePluginPackage.DataversePluginPackageId)\package\$(PublisherPrefix)_%(DataversePluginPackage.DataversePluginPackageId).nupkg</_DestinationPath>
+        </PropertyGroup>
+
+        <Message Text="Looking for package: $(_NupkgSearchPattern)" Importance="high" />
+
+        <!-- Find the .nupkg file -->
+        <ItemGroup>
+            <_FoundNupkg Include="$(_NupkgSearchPattern)" />
+        </ItemGroup>
+
+        <!-- Exclude symbols packages -->
+        <ItemGroup>
+            <_FoundNupkg Remove="@(_FoundNupkg)" Condition="$([System.String]::new(%(Identity)).Contains('.symbols.'))" />
+        </ItemGroup>
+
+        <Message Text="Found package(s): @(_FoundNupkg)" Importance="high" />
+        <Message Text="Destination: $(_DestinationPath)" Importance="high" />
+
+        <!-- Copy the first matching .nupkg (there should only be one) -->
+        <PropertyGroup>
+            <_FirstNupkg>@(_FoundNupkg)</_FirstNupkg>
+        </PropertyGroup>
+        <Copy
+            SourceFiles="$(_FirstNupkg)"
+            DestinationFiles="$(_DestinationPath)"
+            Condition="'@(_FoundNupkg)' != ''"
+            OverwriteReadOnlyFiles="true" />
+
+        <!-- Clean up -->
+        <ItemGroup>
+            <_FoundNupkg Remove="@(_FoundNupkg)" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="_CalculateDataversePluginsPath"
+        Outputs="%(DataversePluginPackage.Identity)"
+        BeforeTargets="CopyPluginPackages">
+        <MSBuild Projects="%(DataversePluginPackage.Identity)"
+            Targets="_GetOutputItemsFromPack"
+            Properties="Configuration=$(Configuration);FileVersion=$(FileVersion)">
+            <Output TaskParameter="TargetOutputs" ItemName="DataversePluginPackageOutput" />
+        </MSBuild>
+        <ItemGroup>
+            <DataversePluginPackage Update="%(DataversePluginPackage.Identity)"
+                Condition="$([System.String]::new(%(DataversePluginPackageOutput.Identity)).EndsWith('nupkg'))">
+                <ProjectRelativeDir>%(DataversePluginPackageOutput.RelativeDir)</ProjectRelativeDir>
+            </DataversePluginPackage>
+        </ItemGroup>
+    </Target>
+
+    <Target Name="PackPlugins" BeforeTargets="CopyPluginPackages">
+        <MSBuild Projects="%(DataversePluginPackage.Identity)"
+            Targets="Pack"
+            Properties="Configuration=$(Configuration);FileVersion=$(FileVersion)" />
+    </Target>
+
+    <Target Name="BuildPlugins" BeforeTargets="PackPlugins">
+        <MSBuild Projects="%(DataversePluginPackage.Identity)"
+            Targets="Build"
+            Properties="Configuration=$(Configuration);FileVersion=$(FileVersion)" />
+    </Target>
+
+    <Target Name="CleanPlugins" BeforeTargets="Clean">
+        <MSBuild Projects="%(DataversePluginPackage.Identity)"
+            Targets="Clean"
+            Properties="Configuration=$(Configuration);FileVersion=$(FileVersion)" />
+    </Target>
+
+    <Target Name="RestorePlugins" BeforeTargets="Restore">
+        <MSBuild Projects="%(DataversePluginPackage.Identity)"
+            Targets="Restore"
+            Properties="Configuration=$(Configuration);FileVersion=$(FileVersion)" />
+    </Target>
+
+    <Target Name="_CalculateDataversePluginsPackageId"
+        Outputs="%(ProjectReference.Identity)"
+        BeforeTargets="_CalculateDataversePluginsPath;CleanPlugins;RestorePlugins;PackPlugins;ProcessCdsProjectReferencesOutputs">
+        <XmlPeek XmlInputPath="%(ProjectReference.Identity)"
+            Query="Project/PropertyGroup/PackageId/text()"
+            Condition="'%(ProjectReference.Identity)'!=''">
+            <Output TaskParameter="Result" ItemName="DataversePluginPackageId" />
+        </XmlPeek>
+        <Message
+            Text="ProjectReference: %(ProjectReference.Identity) PackageId: @(DataversePluginPackageId)"
+            Importance="High" />
+        <ItemGroup>
+            <DataversePluginPackage Include="%(ProjectReference.Identity)"
+                Condition="'@(DataversePluginPackageId)' != ''">
+                <DataversePluginPackageId>@(DataversePluginPackageId)</DataversePluginPackageId>
+            </DataversePluginPackage>
+            <ProjectReference Remove="%(ProjectReference.Identity)"
+                Condition="'@(DataversePluginPackageId)' != ''" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="_SetFileVersion"
+        Condition="'$(FileVersion)' == ''"
+        BeforeTargets="_CalculateDataversePluginsPackageId;_CalculateDataversePluginsPath;CopyPluginPackages;CleanPlugins;RestorePlugins;PackPlugins">
+        <XmlPeek XmlInputPath="$(SolutionRootPath)\Other\Solution.xml"
+            Query="ImportExportXml/SolutionManifest/Version/text()">
+            <Output TaskParameter="Result" ItemName="SolutionVersion" />
+        </XmlPeek>
+        <Message Text="Solution version @(SolutionVersion)" Importance="high" />
+        <PropertyGroup>
+            <FileVersion>@(SolutionVersion)</FileVersion>
+            <_ReadFileVersionFromSolution>true</_ReadFileVersionFromSolution>
+        </PropertyGroup>
+    </Target>
+
+    <Target Name="_SetFileVersionOnSolution"
+        Condition="'$(FileVersion)' != '' AND '$(_ReadFileVersionFromSolution)' != 'true'"
+        BeforeTargets="_CalculateDataversePluginsPackageId;_CalculateDataversePluginsPath;CopyPluginPackages;CleanPlugins;RestorePlugins;PackPlugins">
+        <XmlPoke XmlInputPath="$(SolutionRootPath)\Other\Solution.xml"
+            Query="ImportExportXml/SolutionManifest/Version"
+            Value="$(FileVersion)" />
+        <Message Text="Set Solution version to $(FileVersion)" Importance="high" />
+    </Target>
+
+    <Target Name="_SetPublisherPrefix"
+        Condition="'$(PublisherPrefix)' == ''"
+        BeforeTargets="CopyPluginPackages">
+        <XmlPeek XmlInputPath="$(SolutionRootPath)\Other\Solution.xml"
+            Query="ImportExportXml/SolutionManifest/Publisher/CustomizationPrefix/text()">
+            <Output TaskParameter="Result" ItemName="PublisherPrefix" />
+        </XmlPeek>
+        <Message
+            Text="Publisher Prefix '@(PublisherPrefix)' read from $(SolutionRootPath)\Other\Solution.xml"
+            Importance="high" />
+        <PropertyGroup>
+            <PublisherPrefix>@(PublisherPrefix)</PublisherPrefix>
+        </PropertyGroup>
+    </Target>
+
+</Project>

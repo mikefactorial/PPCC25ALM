@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "description": "My webpack project",
+  "name": "webpack-project",
+  "scripts": {
+    "build": "webpack --mode=production --node-env=production",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "lint": "eslint src",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@types/xrm": "^9.0.87",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.4.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "dataverse-ify": "^1.0.13",
+    "jiti": "^2.6.1"
+  }
+}

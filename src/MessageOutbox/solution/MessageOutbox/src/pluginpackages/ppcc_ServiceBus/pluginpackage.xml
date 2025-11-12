@@ -1,0 +1,12 @@
+<pluginpackage uniquename="ppcc_ServiceBus">
+  <exportkeyversion>1</exportkeyversion>
+  <iscustomizable>1</iscustomizable>
+  <managedidentityid>
+    <managedidentityid>ea4448b4-22ab-f011-bbd3-6045bd5ee967</managedidentityid>
+  </managedidentityid>
+  <name>ppcc_ServiceBus</name>
+  <package mimetype="application/octet-stream">ppcc_ServiceBus.nupkg</package>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+  <version>1.0.0</version>
+</pluginpackage>

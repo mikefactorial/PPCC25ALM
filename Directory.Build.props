@@ -1,0 +1,37 @@
+<!-- Directory.Build.props (repo root) -->
+<Project>
+
+    <!-- Scope all settings to Dataverse solution projects only -->
+    <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.cdsproj'">
+        <!-- Path to the PowerApps MSBuild targets -->
+        <PowerAppsTargetsPath Condition="'$(PowerAppsTargetsPath)' == ''">
+            $(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps
+        </PowerAppsTargetsPath>
+
+        <!-- Target framework defaults from Sdk.props (keep for compatibility with tasks) -->
+        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6.2</TargetFrameworkVersion>
+        <TargetFramework Condition="'$(TargetFramework)' == ''">net462</TargetFramework>
+        <!-- Dataverse solution conventions -->
+        <SolutionRootPath Condition="'$(SolutionRootPath)' == ''">src</SolutionRootPath>
+
+        <!-- Map solution-specific FileVersion properties from package build -->
+        <!-- When building the package project, it passes properties like MessageOutboxFileVersion, ControlsFileVersion, etc. -->
+        <!-- This maps them to the generic FileVersion property that each solution project expects -->
+        <FileVersion Condition="'$(FileVersion)' == '' AND '$(MSBuildProjectName)' == 'MessageOutbox'">$(MessageOutboxFileVersion)</FileVersion>
+        <FileVersion Condition="'$(FileVersion)' == '' AND '$(MSBuildProjectName)' == 'Controls'">$(ControlsFileVersion)</FileVersion>
+        <!-- Add additional solution mappings here as needed -->
+        <!-- <FileVersion Condition="'$(FileVersion)' == '' AND '$(MSBuildProjectName)' == 'AnotherSolution'">$(AnotherSolutionFileVersion)</FileVersion> -->
+    </PropertyGroup>
+
+    <!-- Bring in the VS PowerApps props if present -->
+    <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props"
+        Condition="'$(MSBuildProjectExtension)' == '.cdsproj' AND
+                     Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')" />
+    <!-- Packages required by the targets. Keeping them in props makes restore happy.
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.cdsproj'">
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.Solution" Version="1.*" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0"
+    PrivateAssets="All" />
+  </ItemGroup>
+ -->
+</Project>

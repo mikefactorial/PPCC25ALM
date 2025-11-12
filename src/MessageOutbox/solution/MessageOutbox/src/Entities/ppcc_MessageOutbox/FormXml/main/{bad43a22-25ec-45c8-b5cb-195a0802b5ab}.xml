@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{bad43a22-25ec-45c8-b5cb-195a0802b5ab}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="{b906c7ec-f070-4b8c-9c03-b120b793c65e}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{cca013b6-ab46-423a-8b5e-4c3f6ec1f784}" columns="11">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{f82774d7-45b2-44ab-ac45-c48e395e2668}" colspan="2">
+                        <labels>
+                          <label description="Name" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_name" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="ppcc_name" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9d896407-d0b8-4d0e-972e-137e018dbbeb}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Entity" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_entity" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="ppcc_entity" disabled="true" />
+                      </cell>
+                      <cell id="{7ad551fb-104f-4217-938c-7d07e4533297}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Message Id" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_messageid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="ppcc_messageid" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{7e322c71-ac9b-420f-bdd8-2061367f1591}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Record Id" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_recordid" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="ppcc_recordid" disabled="true" />
+                      </cell>
+                      <cell id="{4bc37339-debb-45bf-8c74-6df0f3fc0c3e}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Message Sent On" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_messagesenton" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="ppcc_messagesenton" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a156a44a-fcba-46e9-8944-21ffa746883d}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Status Reason" languagecode="1033" />
+                        </labels>
+                        <control id="statuscode" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="statuscode" disabled="false" />
+                      </cell>
+                      <cell id="{7196ce0b-3fb8-4d35-9d8c-d4853d0d2df7}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Message Processed On" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_messageprocessedon" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="ppcc_messageprocessedon" disabled="true" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a3b0825b-b8c2-431f-8375-92d0d3d82a58}" locklevel="0" colspan="2" rowspan="20" auto="true">
+                        <labels>
+                          <label description="Message" languagecode="1033" />
+                        </labels>
+                        <control id="ppcc_message" classid="{F9A8A302-114E-466A-B582-6771B2AE0D92}" datafieldname="ppcc_message" disabled="true" uniqueid="{bc69c3a8-6cc2-40c7-8888-d0c6881b7176}" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{a414d772-e02a-4277-a23b-a76788e3e335}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{e2cdd554-a5eb-4f08-a61c-79bd661021c5}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{13769651-e9c9-493f-b5ff-25330bf4f14e}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{c4de6f96-f120-4473-884e-57443efb2410}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{53224711-c501-479e-a416-9cf2e48fb70f}" colspan="1" rowspan="1">
+              <labels>
+                <label description="Owner" languagecode="1033" />
+              </labels>
+              <control id="header_ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{9b7ea759-183f-43ad-a74a-4bdea0c31254}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{794566ec-60d8-4ca2-861c-3018a0fcd424}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{81f571b3-d041-4e27-b238-b2b90760d040}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{500b9212-cbf1-43cd-bb60-33da96e0786b}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+      <controlDescriptions>
+        <controlDescription forControl="{bc69c3a8-6cc2-40c7-8888-d0c6881b7176}">
+          <customControl id="{E0DECE4B-6FC8-4A8F-A065-082708572369}">
+            <parameters>
+              <datafieldname>ppcc_message</datafieldname>
+            </parameters>
+          </customControl>
+          <customControl formFactor="0" name="ppcc_ppcc.PrettyJsonViewer">
+            <parameters>
+              <jsonData type="Multiple">ppcc_message</jsonData>
+            </parameters>
+          </customControl>
+          <customControl formFactor="2" name="ppcc_ppcc.PrettyJsonViewer">
+            <parameters>
+              <jsonData type="Multiple">ppcc_message</jsonData>
+            </parameters>
+          </customControl>
+          <customControl formFactor="1" name="ppcc_ppcc.PrettyJsonViewer">
+            <parameters>
+              <jsonData type="Multiple">ppcc_message</jsonData>
+            </parameters>
+          </customControl>
+        </controlDescription>
+      </controlDescriptions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>
