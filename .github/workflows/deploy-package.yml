@@ -218,10 +218,10 @@ jobs:
 
             - name: Deploy pac package
               run: |
-                  $packageFile = Get-ChildItem -Path "${{ inputs.packageName }}" -Filter "*.pdpkg" | Select-Object -First 1
+                  $packageFile = Get-ChildItem -Path "${{ inputs.packageName }}" -Filter "*.pdpkg.zip" | Select-Object -First 1
 
                   if (-not $packageFile) {
-                      Write-Error "No .pdpkg file found in ${{ inputs.packageName }} directory"
+                      Write-Error "No .pdpkg.zip file found in ${{ inputs.packageName }} directory"
                       exit 1
                   }
 
