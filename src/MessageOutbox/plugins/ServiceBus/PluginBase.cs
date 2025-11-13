@@ -62,7 +62,7 @@ namespace ServiceBus
             }
             finally
             {
-                localPluginContext.Trace($"Exiting {PluginClassName}.Execute()");
+                localPluginContext.Trace($"Exiting {PluginClassName}.Execute() Method");
             }
         }
 
