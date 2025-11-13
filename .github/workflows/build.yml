@@ -584,7 +584,7 @@ jobs:
             // Create package release
             const packageVersion = '${{ steps.package_version.outputs.version }}';
             const packageTag = '${{ steps.package_version.outputs.version_tag }}';
-            const packageFile = `PPCC-ALM-Package_${packageVersion}.zip`;
+            const packageFile = `PPCC-ALM-Package_${packageVersion}.pdpkg.zip`;
             const highestBump = '${{ steps.calc_versions.outputs.highest_bump }}';
 
             const solutionList = allVersions
