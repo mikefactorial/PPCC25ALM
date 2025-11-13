@@ -324,7 +324,7 @@ jobs:
       - name: Create Package Zip
         if: steps.calc_versions.outputs.has_changes == 'true'
         run: |
-          $packageName = "PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.zip"
+          $packageName = "PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.pdpkg.zip"
           Compress-Archive -Path "publish/*" -DestinationPath $packageName -Force
           Write-Host "Package created: $packageName" -ForegroundColor Green
         shell: pwsh
@@ -334,7 +334,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deployment-package-${{ steps.package_version.outputs.version }}
-          path: PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.zip
+          path: PPCC-ALM-Package_${{ steps.package_version.outputs.version }}.pdpkg.zip
           retention-days: 90
 
       # Phase 6: Copy individual solution zips from build output
