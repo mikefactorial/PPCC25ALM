@@ -43,14 +43,13 @@ https://github.com/albanian-xrm/CSDPROJ-SDK/blob/main/AlbanianXrm.CDSProj.Sdk/Sd
     </ItemGroup>
 
 
-    <Target Name="CopyPluginPackages"
-        Outputs="%(DataversePluginPackage.Identity)"
-        BeforeTargets="CopyCdsSolutionContent"
-        Condition="'@(DataversePluginPackage)' != ''">
-
+	<Target Name="CopyPluginPackages" 
+			Outputs="%(DataversePluginPackage.Identity)"
+			BeforeTargets="CopyCdsSolutionContent"
+	>
         <PropertyGroup>
             <!-- Get the directory where the plugin project is located -->
-            <_PluginProjectDir>$([System.IO.Path]::GetDirectoryName(%(DataversePluginPackage.Identity)))</_PluginProjectDir>
+            <_PluginProjectDir>$([System.IO.Path]::GetDirectoryName('%(DataversePluginPackage.Identity)'))</_PluginProjectDir>
             <!-- Build the expected nupkg path: {ProjectDir}\bin\{Configuration}\{PackageId}.*.nupkg -->
             <_NupkgSearchPattern>$(_PluginProjectDir)\bin\$(Configuration)\%(DataversePluginPackage.DataversePluginPackageId).*.nupkg</_NupkgSearchPattern>
             <!-- Destination path -->
