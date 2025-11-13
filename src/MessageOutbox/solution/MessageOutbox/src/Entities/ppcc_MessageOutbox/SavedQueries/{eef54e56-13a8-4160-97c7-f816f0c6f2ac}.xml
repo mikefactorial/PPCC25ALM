@@ -12,6 +12,8 @@
         <row name="result" id="ppcc_messageoutboxid">
           <cell name="ppcc_name" width="300" />
           <cell name="createdon" width="125" />
+          <cell name="createdby" width="104" />
+          <cell name="modifiedby" width="112" />
         </row>
       </grid>
     </layoutxml>
@@ -26,6 +28,8 @@
           <filter type="and">
             <condition attribute="statecode" operator="eq" value="1" />
           </filter>
+          <attribute name="createdby" />
+          <attribute name="modifiedby" />
         </entity>
       </fetch>
     </fetchxml>

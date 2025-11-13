@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <managedidentity managedidentityid="ea4448b4-22ab-f011-bbd3-6045bd5ee967" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <applicationid>{21a7b90a-5a02-4371-afe0-70e3ba3503e6}</applicationid>
+  <applicationid>{f682a938-4ec2-4a84-ae0c-70e40663a754}</applicationid>
   <credentialsource>2</credentialsource>
   <identitytype>0</identitytype>
   <iscustomizable>1</iscustomizable>
@@ -8,5 +8,5 @@
   <statecode>0</statecode>
   <statuscode>1</statuscode>
   <subjectscope>1</subjectscope>
-  <tenantid>{441bb662-a519-454c-87ac-316fb436bbed}</tenantid>
+  <tenantid>{4e32a00f-83d6-404d-9001-251190c9385f}</tenantid>
 </managedidentity>

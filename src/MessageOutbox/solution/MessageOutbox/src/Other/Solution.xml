@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ImportExportXml version="9.2.25103.142" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25103.142" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25103.00142">
+<ImportExportXml version="9.2.25095.165" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25095.165" OrganizationSchemaType="Full" CRMServerServiceabilityVersion="9.2.25101.00159">
   <SolutionManifest>
     <UniqueName>MessageOutbox</UniqueName>
     <LocalizedNames>
@@ -84,18 +84,16 @@
       <RootComponent type="61" schemaName="ppcc_ServiceBus" behavior="0" />
       <RootComponent type="62" schemaName="ppcc_MessageOutboxViewer" behavior="0" />
       <RootComponent type="80" schemaName="ppcc_MessageOutboxViewer" behavior="0" />
-      <RootComponent type="91" id="{2a7b59d2-92b4-f011-bbd2-0022480b9135}" schemaName="ServiceBus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" behavior="0" />
+      <RootComponent type="91" id="{db8f435d-bdc0-f011-bbd2-0022480b0163}" schemaName="ServiceBus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" behavior="0" />
       <RootComponent type="92" id="{d12ddb8a-21ab-f011-bbd3-6045bd5ee967}" behavior="0" />
     </RootComponents>
     <MissingDependencies>
       <MissingDependency>
-        <Required type="61" schemaName="msdyn_/Images/AppModule_Default_Icon.png" displayName="msdyn_/Images/AppModule_Default_Icon.png" solution="AppModuleWebResources (2.5)">
-          <package appName="AppModule Web Resources Package" version="2.5">AppModuleWebResources (2.5)</package>
-        </Required>
+        <Required type="61" schemaName="msdyn_/Images/AppModule_Default_Icon.png" displayName="msdyn_/Images/AppModule_Default_Icon.png" solution="AppModuleWebResources (2.5)" />
         <Dependent type="80" schemaName="ppcc_MessageOutboxViewer" displayName="Message Outbox Viewer" />
       </MissingDependency>
       <MissingDependency>
-        <Required type="66" schemaName="ppcc_ppcc.PrettyJsonViewer" displayName="ppcc_ppcc.PrettyJsonViewer" solution="Controls (1.0)" />
+        <Required type="66" schemaName="ppcc_ppcc.PrettyJsonViewer" displayName="ppcc_ppcc.PrettyJsonViewer" solution="Active" />
         <Dependent type="60" displayName="Information" parentDisplayName="Message Outbox" id="{bad43a22-25ec-45c8-b5cb-195a0802b5ab}" />
       </MissingDependency>
       <MissingDependency>
